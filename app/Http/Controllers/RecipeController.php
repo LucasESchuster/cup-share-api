@@ -46,16 +46,19 @@ class RecipeController extends Controller
 
         $recipe = DB::transaction(function () use ($data, $request) {
             $recipe = $request->user()->recipes()->create([
-                'brew_method_id' => $data['brew_method_id'],
-                'recipe_type_id' => $data['recipe_type_id'],
-                'title' => $data['title'],
-                'slug' => Str::slug($data['title']).'-'.Str::random(6),
-                'description' => $data['description'] ?? null,
-                'coffee_grams' => $data['coffee_grams'],
-                'water_ml' => $data['water_ml'] ?? null,
-                'yield_ml' => $data['yield_ml'] ?? null,
-                'brew_time_seconds' => $data['brew_time_seconds'],
-                'visibility' => $data['visibility'] ?? 'public',
+                'brew_method_id'            => $data['brew_method_id'],
+                'recipe_type_id'            => $data['recipe_type_id'],
+                'title'                     => $data['title'],
+                'slug'                      => Str::slug($data['title']).'-'.Str::random(6),
+                'description'               => $data['description'] ?? null,
+                'coffee_grams'              => $data['coffee_grams'],
+                'water_ml'                  => $data['water_ml'] ?? null,
+                'yield_ml'                  => $data['yield_ml'] ?? null,
+                'brew_time_seconds'         => $data['brew_time_seconds'],
+                'visibility'                => $data['visibility'] ?? 'public',
+                'video_url'                 => $data['video_url'] ?? null,
+                'water_temperature_celsius' => $data['water_temperature_celsius'] ?? null,
+                'coffee_description'        => $data['coffee_description'] ?? null,
             ]);
 
             $this->syncSteps($recipe, $data['steps'] ?? []);
@@ -76,17 +79,22 @@ class RecipeController extends Controller
         $data = $request->validated();
 
         DB::transaction(function () use ($recipe, $data) {
+            $nullableKeys = ['description', 'water_ml', 'yield_ml', 'video_url', 'water_temperature_celsius', 'coffee_description'];
+
             $fields = array_filter([
-                'brew_method_id' => $data['brew_method_id'] ?? null,
-                'recipe_type_id' => $data['recipe_type_id'] ?? null,
-                'title' => $data['title'] ?? null,
-                'description' => array_key_exists('description', $data) ? $data['description'] : null,
-                'coffee_grams' => $data['coffee_grams'] ?? null,
-                'water_ml' => array_key_exists('water_ml', $data) ? $data['water_ml'] : null,
-                'yield_ml' => array_key_exists('yield_ml', $data) ? $data['yield_ml'] : null,
-                'brew_time_seconds' => $data['brew_time_seconds'] ?? null,
-                'visibility' => $data['visibility'] ?? null,
-            ], fn ($v) => $v !== null);
+                'brew_method_id'            => $data['brew_method_id'] ?? null,
+                'recipe_type_id'            => $data['recipe_type_id'] ?? null,
+                'title'                     => $data['title'] ?? null,
+                'description'               => array_key_exists('description', $data) ? $data['description'] : null,
+                'coffee_grams'              => $data['coffee_grams'] ?? null,
+                'water_ml'                  => array_key_exists('water_ml', $data) ? $data['water_ml'] : null,
+                'yield_ml'                  => array_key_exists('yield_ml', $data) ? $data['yield_ml'] : null,
+                'brew_time_seconds'         => $data['brew_time_seconds'] ?? null,
+                'visibility'                => $data['visibility'] ?? null,
+                'video_url'                 => array_key_exists('video_url', $data) ? $data['video_url'] : null,
+                'water_temperature_celsius' => array_key_exists('water_temperature_celsius', $data) ? $data['water_temperature_celsius'] : null,
+                'coffee_description'        => array_key_exists('coffee_description', $data) ? $data['coffee_description'] : null,
+            ], fn ($v, $k) => $v !== null || in_array($k, $nullableKeys), ARRAY_FILTER_USE_BOTH);
 
             if (isset($data['title'])) {
                 $fields['slug'] = Str::slug($data['title']).'-'.Str::random(6);
