@@ -28,6 +28,8 @@ class Recipe extends Model
         'brew_time_seconds',
         'visibility',
         'video_url',
+        'water_temperature_celsius',
+        'coffee_description',
     ];
 
     protected function casts(): array

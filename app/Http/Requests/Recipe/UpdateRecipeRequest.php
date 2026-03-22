@@ -25,7 +25,9 @@ class UpdateRecipeRequest extends FormRequest
             'yield_ml' => ['nullable', 'integer', 'min:1'],
             'brew_time_seconds' => ['sometimes', 'integer', 'min:1'],
             'visibility' => ['sometimes', new Enum(RecipeVisibility::class)],
-            'video_url' => ['sometimes', 'nullable', 'url', 'max:2048'],
+            'video_url'                  => ['sometimes', 'nullable', 'url', 'max:2048'],
+            'water_temperature_celsius'  => ['sometimes', 'nullable', 'integer', 'min:0', 'max:100'],
+            'coffee_description'         => ['sometimes', 'nullable', 'string', 'max:1000'],
 
             // Steps (full replace when provided)
             'steps' => ['sometimes', 'array'],
