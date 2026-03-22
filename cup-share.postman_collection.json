@@ -1,0 +1,486 @@
+{
+  "info": {
+    "name": "Cup Share API",
+    "description": "API RESTful para compartilhamento de receitas de café.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Request Magic Link",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/magic-link", "host": ["{{base_url}}"], "path": ["auth", "magic-link"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"voce@exemplo.com\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Consume Magic Link Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) {",
+                  "  pm.collectionVariables.set('token', json.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/auth/magic-link/:token", "host": ["{{base_url}}"], "path": ["auth", "magic-link", ":token"], "variable": [{ "key": "token", "value": "" }] }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/auth/logout", "host": ["{{base_url}}"], "path": ["auth", "logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/users/me", "host": ["{{base_url}}"], "path": ["users", "me"] }
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/users/me", "host": ["{{base_url}}"], "path": ["users", "me"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Meu Nome\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Delete My Account",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/users/me", "host": ["{{base_url}}"], "path": ["users", "me"] }
+          }
+        },
+        {
+          "name": "My Recipes",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/users/me/recipes", "host": ["{{base_url}}"], "path": ["users", "me", "recipes"] }
+          }
+        },
+        {
+          "name": "My Equipment",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/users/me/equipment", "host": ["{{base_url}}"], "path": ["users", "me", "equipment"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Brew Methods",
+      "item": [
+        {
+          "name": "List Brew Methods",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/brew-methods", "host": ["{{base_url}}"], "path": ["brew-methods"] }
+          }
+        },
+        {
+          "name": "Get Brew Method",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/brew-methods/:id", "host": ["{{base_url}}"], "path": ["brew-methods", ":id"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Create Brew Method",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/brew-methods", "host": ["{{base_url}}"], "path": ["brew-methods"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Hario Switch\",\n  \"description\": \"Método híbrido entre imersão e percolação.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Update Brew Method",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/brew-methods/:id", "host": ["{{base_url}}"], "path": ["brew-methods", ":id"], "variable": [{ "key": "id", "value": "1" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Hario Switch\",\n  \"description\": \"Descrição atualizada.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Delete Brew Method",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/brew-methods/:id", "host": ["{{base_url}}"], "path": ["brew-methods", ":id"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recipe Types",
+      "item": [
+        {
+          "name": "List Recipe Types",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/recipe-types", "host": ["{{base_url}}"], "path": ["recipe-types"] }
+          }
+        },
+        {
+          "name": "Get Recipe Type",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/recipe-types/:id", "host": ["{{base_url}}"], "path": ["recipe-types", ":id"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Create Recipe Type",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/recipe-types", "host": ["{{base_url}}"], "path": ["recipe-types"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ristretto\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Update Recipe Type",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/recipe-types/:id", "host": ["{{base_url}}"], "path": ["recipe-types", ":id"], "variable": [{ "key": "id", "value": "1" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ristretto\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Delete Recipe Type",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/recipe-types/:id", "host": ["{{base_url}}"], "path": ["recipe-types", ":id"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ingredients",
+      "item": [
+        {
+          "name": "List Ingredients",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/ingredients", "host": ["{{base_url}}"], "path": ["ingredients"] }
+          }
+        },
+        {
+          "name": "Get Ingredient",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/ingredients/:id", "host": ["{{base_url}}"], "path": ["ingredients", ":id"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Create Ingredient",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/ingredients", "host": ["{{base_url}}"], "path": ["ingredients"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Leite de macadâmia\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Update Ingredient",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/ingredients/:id", "host": ["{{base_url}}"], "path": ["ingredients", ":id"], "variable": [{ "key": "id", "value": "1" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Leite de macadâmia\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Delete Ingredient",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/ingredients/:id", "host": ["{{base_url}}"], "path": ["ingredients", ":id"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Equipment",
+      "item": [
+        {
+          "name": "List Equipment (Global)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/equipment", "host": ["{{base_url}}"], "path": ["equipment"] }
+          }
+        },
+        {
+          "name": "Get Equipment",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/equipment/:id", "host": ["{{base_url}}"], "path": ["equipment", ":id"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Create Equipment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/equipment", "host": ["{{base_url}}"], "path": ["equipment"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Meu Moedor\",\n  \"brand\": \"Comandante\",\n  \"model\": \"C40\",\n  \"type\": \"grinder\",\n  \"is_personal\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Update Equipment",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/equipment/:id", "host": ["{{base_url}}"], "path": ["equipment", ":id"], "variable": [{ "key": "id", "value": "1" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Meu Moedor Atualizado\",\n  \"brand\": \"Comandante\",\n  \"model\": \"C40 MK4\",\n  \"type\": \"grinder\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Delete Equipment",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/equipment/:id", "host": ["{{base_url}}"], "path": ["equipment", ":id"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recipes",
+      "item": [
+        {
+          "name": "Public Feed",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/recipes", "host": ["{{base_url}}"], "path": ["recipes"] }
+          }
+        },
+        {
+          "name": "Get Recipe",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/recipes/:id", "host": ["{{base_url}}"], "path": ["recipes", ":id"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Create Recipe (Filter Coffee)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/recipes", "host": ["{{base_url}}"], "path": ["recipes"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"V60 Clarity\",\n  \"brew_method_id\": 1,\n  \"recipe_type_id\": 1,\n  \"coffee_grams\": 15,\n  \"water_ml\": 250,\n  \"yield_ml\": null,\n  \"brew_time_seconds\": 180,\n  \"visibility\": \"public\",\n  \"description\": \"Receita clean e brilhante para o V60.\",\n  \"steps\": [\n    { \"order\": 1, \"description\": \"Aqueça a água a 94°C.\", \"duration_seconds\": null },\n    { \"order\": 2, \"description\": \"Bloom: despeje 30ml e aguarde 30s.\", \"duration_seconds\": 30 },\n    { \"order\": 3, \"description\": \"Despeje o restante em espiral até 250ml.\", \"duration_seconds\": 150 }\n  ],\n  \"ingredients\": []\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Create Recipe (Espresso)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/recipes", "host": ["{{base_url}}"], "path": ["recipes"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Espresso Clássico\",\n  \"brew_method_id\": 8,\n  \"recipe_type_id\": 2,\n  \"coffee_grams\": 18,\n  \"water_ml\": null,\n  \"yield_ml\": 36,\n  \"brew_time_seconds\": 27,\n  \"visibility\": \"public\",\n  \"description\": \"Espresso equilibrado com ratio 1:2.\",\n  \"steps\": [\n    { \"order\": 1, \"description\": \"Dose e distribua 18g no porta-filtro.\", \"duration_seconds\": null },\n    { \"order\": 2, \"description\": \"Tamp com 20kg de pressão.\", \"duration_seconds\": null },\n    { \"order\": 3, \"description\": \"Extraia até 36ml em ~27 segundos.\", \"duration_seconds\": 27 }\n  ],\n  \"ingredients\": []\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Update Recipe",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/recipes/:id", "host": ["{{base_url}}"], "path": ["recipes", ":id"], "variable": [{ "key": "id", "value": "1" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"V60 Clarity v2\",\n  \"coffee_grams\": 16,\n  \"water_ml\": 260,\n  \"brew_time_seconds\": 200,\n  \"steps\": [\n    { \"order\": 1, \"description\": \"Aqueça a água a 93°C.\", \"duration_seconds\": null },\n    { \"order\": 2, \"description\": \"Bloom: despeje 32ml e aguarde 35s.\", \"duration_seconds\": 35 },\n    { \"order\": 3, \"description\": \"Despeje o restante em espiral até 260ml.\", \"duration_seconds\": 165 }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Delete Recipe",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/recipes/:id", "host": ["{{base_url}}"], "path": ["recipes", ":id"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Update Visibility",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/recipes/:id/visibility", "host": ["{{base_url}}"], "path": ["recipes", ":id", "visibility"], "variable": [{ "key": "id", "value": "1" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visibility\": \"private\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recipe Equipment",
+      "item": [
+        {
+          "name": "Link Equipment to Recipe",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/recipes/:recipe_id/equipment", "host": ["{{base_url}}"], "path": ["recipes", ":recipe_id", "equipment"], "variable": [{ "key": "recipe_id", "value": "1" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"equipment_id\": 1,\n  \"grinder_clicks\": 24,\n  \"parameters\": null\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Update Recipe Equipment",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/recipes/:recipe_id/equipment/:equipment_id", "host": ["{{base_url}}"], "path": ["recipes", ":recipe_id", "equipment", ":equipment_id"], "variable": [{ "key": "recipe_id", "value": "1" }, { "key": "equipment_id", "value": "1" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grinder_clicks\": 26,\n  \"parameters\": { \"temperature\": 93 }\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Unlink Equipment from Recipe",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/recipes/:recipe_id/equipment/:equipment_id", "host": ["{{base_url}}"], "path": ["recipes", ":recipe_id", "equipment", ":equipment_id"], "variable": [{ "key": "recipe_id", "value": "1" }, { "key": "equipment_id", "value": "1" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Likes",
+      "item": [
+        {
+          "name": "Get Likes Count",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/recipes/:id/likes", "host": ["{{base_url}}"], "path": ["recipes", ":id", "likes"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Like Recipe",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{base_url}}/recipes/:id/likes", "host": ["{{base_url}}"], "path": ["recipes", ":id", "likes"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Unlike Recipe",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/recipes/:id/likes", "host": ["{{base_url}}"], "path": ["recipes", ":id", "likes"], "variable": [{ "key": "id", "value": "1" }] }
+          }
+        }
+      ]
+    }
+  ]
+}
