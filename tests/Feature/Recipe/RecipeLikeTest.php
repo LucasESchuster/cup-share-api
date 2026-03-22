@@ -4,7 +4,6 @@ namespace Tests\Feature\Recipe;
 
 use App\Models\BrewMethod;
 use App\Models\Recipe;
-use App\Models\RecipeType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -20,14 +19,12 @@ class RecipeLikeTest extends TestCase
     {
         parent::setUp();
 
-        $brewMethod = BrewMethod::create(['name' => 'V60', 'slug' => 'v60']);
-        $recipeType = RecipeType::create(['name' => 'Filtrado', 'slug' => 'filtrado']);
+        $brewMethod = BrewMethod::create(['name' => 'V60', 'slug' => 'v60', 'category' => 'filter']);
         $this->owner = User::factory()->create();
 
         $this->recipe = Recipe::factory()->create([
             'user_id' => $this->owner->id,
             'brew_method_id' => $brewMethod->id,
-            'recipe_type_id' => $recipeType->id,
             'visibility' => 'public',
         ]);
     }
@@ -76,5 +73,68 @@ class RecipeLikeTest extends TestCase
         $this->getJson("/api/v1/recipes/{$this->recipe->id}/likes")
             ->assertStatus(200)
             ->assertJsonStructure(['likes_count', 'liked_by_me']);
+    }
+
+    public function test_liked_by_me_is_true_for_authenticated_user_who_liked(): void
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('test')->plainTextToken;
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson("/api/v1/recipes/{$this->recipe->id}/likes")
+            ->assertStatus(201)
+            ->assertJson(['likes_count' => 1]);
+
+        $this->withHeaders(['Authorization' => "Bearer $token"])
+            ->getJson("/api/v1/recipes/{$this->recipe->id}/likes")
+            ->assertJson(['likes_count' => 1, 'liked_by_me' => true]);
+    }
+
+    public function test_liked_by_me_is_false_for_anonymous_user(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson("/api/v1/recipes/{$this->recipe->id}/likes");
+
+        $this->getJson("/api/v1/recipes/{$this->recipe->id}/likes")
+            ->assertJson(['likes_count' => 1, 'liked_by_me' => false]);
+    }
+
+    public function test_recipe_index_includes_liked_by_me_true_for_authenticated_user(): void
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('test')->plainTextToken;
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson("/api/v1/recipes/{$this->recipe->id}/likes");
+
+        $this->withHeaders(['Authorization' => "Bearer $token"])
+            ->getJson('/api/v1/recipes')
+            ->assertJsonFragment(['id' => $this->recipe->id, 'liked_by_me' => true]);
+    }
+
+    public function test_recipe_index_includes_liked_by_me_false_for_anonymous_user(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson("/api/v1/recipes/{$this->recipe->id}/likes");
+
+        $this->getJson('/api/v1/recipes')
+            ->assertJsonFragment(['id' => $this->recipe->id, 'liked_by_me' => false]);
+    }
+
+    public function test_recipe_show_includes_liked_by_me_true_for_authenticated_user(): void
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('test')->plainTextToken;
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson("/api/v1/recipes/{$this->recipe->id}/likes");
+
+        $this->withHeaders(['Authorization' => "Bearer $token"])
+            ->getJson("/api/v1/recipes/{$this->recipe->id}")
+            ->assertJsonFragment(['liked_by_me' => true]);
     }
 }

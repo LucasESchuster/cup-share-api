@@ -4,7 +4,6 @@ namespace Tests\Feature\Recipe;
 
 use App\Models\BrewMethod;
 use App\Models\Recipe;
-use App\Models\RecipeType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -15,15 +14,13 @@ class RecipeCrudTest extends TestCase
 
     private User $user;
     private BrewMethod $brewMethod;
-    private RecipeType $recipeType;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->user = User::factory()->create();
-        $this->brewMethod = BrewMethod::create(['name' => 'V60', 'slug' => 'v60']);
-        $this->recipeType = RecipeType::create(['name' => 'Filtrado', 'slug' => 'filtrado']);
+        $this->brewMethod = BrewMethod::create(['name' => 'V60', 'slug' => 'v60', 'category' => 'filter']);
     }
 
     private function recipePayload(array $overrides = []): array
@@ -31,7 +28,6 @@ class RecipeCrudTest extends TestCase
         return array_merge([
             'title' => 'Minha receita V60',
             'brew_method_id' => $this->brewMethod->id,
-            'recipe_type_id' => $this->recipeType->id,
             'coffee_grams' => 15,
             'water_ml' => 250,
             'brew_time_seconds' => 210,
@@ -64,7 +60,6 @@ class RecipeCrudTest extends TestCase
         $recipe = Recipe::factory()->create([
             'user_id' => $this->user->id,
             'brew_method_id' => $this->brewMethod->id,
-            'recipe_type_id' => $this->recipeType->id,
             'visibility' => 'public',
         ]);
 
@@ -78,7 +73,6 @@ class RecipeCrudTest extends TestCase
         $recipe = Recipe::factory()->create([
             'user_id' => $this->user->id,
             'brew_method_id' => $this->brewMethod->id,
-            'recipe_type_id' => $this->recipeType->id,
         ]);
 
         $this->actingAs($this->user)
@@ -93,7 +87,6 @@ class RecipeCrudTest extends TestCase
         $recipe = Recipe::factory()->create([
             'user_id' => $this->user->id,
             'brew_method_id' => $this->brewMethod->id,
-            'recipe_type_id' => $this->recipeType->id,
         ]);
 
         $this->actingAs($otherUser)
@@ -106,7 +99,6 @@ class RecipeCrudTest extends TestCase
         $recipe = Recipe::factory()->create([
             'user_id' => $this->user->id,
             'brew_method_id' => $this->brewMethod->id,
-            'recipe_type_id' => $this->recipeType->id,
         ]);
 
         $this->actingAs($this->user)

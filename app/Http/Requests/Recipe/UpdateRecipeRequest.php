@@ -19,7 +19,6 @@ class UpdateRecipeRequest extends FormRequest
             'title' => ['sometimes', 'string', 'max:200'],
             'description' => ['nullable', 'string', 'max:2000'],
             'brew_method_id' => ['sometimes', 'integer', 'exists:brew_methods,id'],
-            'recipe_type_id' => ['sometimes', 'integer', 'exists:recipe_types,id'],
             'coffee_grams' => ['sometimes', 'numeric', 'min:0.1', 'max:9999'],
             'water_ml' => ['nullable', 'integer', 'min:1'],
             'yield_ml' => ['nullable', 'integer', 'min:1'],

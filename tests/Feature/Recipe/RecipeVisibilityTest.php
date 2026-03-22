@@ -4,7 +4,6 @@ namespace Tests\Feature\Recipe;
 
 use App\Models\BrewMethod;
 use App\Models\Recipe;
-use App\Models\RecipeType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -15,15 +14,13 @@ class RecipeVisibilityTest extends TestCase
 
     private User $owner;
     private BrewMethod $brewMethod;
-    private RecipeType $recipeType;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->owner = User::factory()->create();
-        $this->brewMethod = BrewMethod::create(['name' => 'V60', 'slug' => 'v60']);
-        $this->recipeType = RecipeType::create(['name' => 'Filtrado', 'slug' => 'filtrado']);
+        $this->brewMethod = BrewMethod::create(['name' => 'V60', 'slug' => 'v60', 'category' => 'filter']);
     }
 
     public function test_private_recipe_is_not_in_public_feed(): void
@@ -31,7 +28,6 @@ class RecipeVisibilityTest extends TestCase
         Recipe::factory()->create([
             'user_id' => $this->owner->id,
             'brew_method_id' => $this->brewMethod->id,
-            'recipe_type_id' => $this->recipeType->id,
             'visibility' => 'private',
             'title' => 'Segredo',
         ]);
@@ -47,7 +43,6 @@ class RecipeVisibilityTest extends TestCase
         $recipe = Recipe::factory()->create([
             'user_id' => $this->owner->id,
             'brew_method_id' => $this->brewMethod->id,
-            'recipe_type_id' => $this->recipeType->id,
             'visibility' => 'private',
         ]);
 
@@ -61,7 +56,6 @@ class RecipeVisibilityTest extends TestCase
         $recipe = Recipe::factory()->create([
             'user_id' => $this->owner->id,
             'brew_method_id' => $this->brewMethod->id,
-            'recipe_type_id' => $this->recipeType->id,
             'visibility' => 'private',
             'title' => 'Minha privada',
         ]);
@@ -77,7 +71,6 @@ class RecipeVisibilityTest extends TestCase
         $recipe = Recipe::factory()->create([
             'user_id' => $this->owner->id,
             'brew_method_id' => $this->brewMethod->id,
-            'recipe_type_id' => $this->recipeType->id,
             'visibility' => 'public',
         ]);
 

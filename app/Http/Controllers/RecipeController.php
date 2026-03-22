@@ -5,37 +5,58 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Recipe\StoreRecipeRequest;
 use App\Http\Requests\Recipe\UpdateRecipeRequest;
 use App\Http\Resources\RecipeResource;
+use App\Models\Like;
 use App\Models\Recipe;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class RecipeController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
         $recipes = Recipe::public()
-            ->with(['user', 'brewMethod', 'recipeType'])
+            ->with(['user', 'brewMethod'])
             ->when($request->filled('brew_method_id'), fn ($q) => $q->where('brew_method_id', $request->brew_method_id))
-            ->when($request->filled('recipe_type_id'), fn ($q) => $q->where('recipe_type_id', $request->recipe_type_id))
             ->latest()
             ->paginate(15);
+
+        $user = null;
+        if ($token = $request->bearerToken()) {
+            $user = PersonalAccessToken::findToken($token)?->tokenable;
+        }
+
+        if ($user) {
+            $likedIds = Like::where('user_id', $user->id)
+                ->whereIn('recipe_id', $recipes->pluck('id'))
+                ->pluck('recipe_id')
+                ->all();
+
+            $recipes->each(fn ($recipe) => $recipe->setAttribute('liked_by_me', in_array($recipe->id, $likedIds)));
+        }
 
         return RecipeResource::collection($recipes);
     }
 
     public function show(Recipe $recipe): RecipeResource
     {
+        $authUser = auth('sanctum')->user();
+
         if ($recipe->visibility->value === 'private') {
-            $user = auth('sanctum')->user();
-            if (! $user || $user->id !== $recipe->user_id) {
+            if (! $authUser || $authUser->id !== $recipe->user_id) {
                 abort(404);
             }
         }
 
-        $recipe->load(['user', 'brewMethod', 'recipeType', 'steps', 'ingredients', 'equipment']);
+        $recipe->load(['user', 'brewMethod', 'steps', 'ingredients', 'equipment']);
+
+        $recipe->setAttribute(
+            'liked_by_me',
+            $authUser && $recipe->likes()->where('user_id', $authUser->id)->exists()
+        );
 
         return new RecipeResource($recipe);
     }
@@ -47,7 +68,6 @@ class RecipeController extends Controller
         $recipe = DB::transaction(function () use ($data, $request) {
             $recipe = $request->user()->recipes()->create([
                 'brew_method_id'            => $data['brew_method_id'],
-                'recipe_type_id'            => $data['recipe_type_id'],
                 'title'                     => $data['title'],
                 'slug'                      => Str::slug($data['title']).'-'.Str::random(6),
                 'description'               => $data['description'] ?? null,
@@ -67,7 +87,7 @@ class RecipeController extends Controller
             return $recipe;
         });
 
-        $recipe->load(['user', 'brewMethod', 'recipeType', 'steps', 'ingredients', 'equipment']);
+        $recipe->load(['user', 'brewMethod', 'steps', 'ingredients', 'equipment']);
 
         return new RecipeResource($recipe);
     }
@@ -83,7 +103,6 @@ class RecipeController extends Controller
 
             $fields = array_filter([
                 'brew_method_id'            => $data['brew_method_id'] ?? null,
-                'recipe_type_id'            => $data['recipe_type_id'] ?? null,
                 'title'                     => $data['title'] ?? null,
                 'description'               => array_key_exists('description', $data) ? $data['description'] : null,
                 'coffee_grams'              => $data['coffee_grams'] ?? null,
@@ -111,7 +130,7 @@ class RecipeController extends Controller
             }
         });
 
-        $recipe->load(['user', 'brewMethod', 'recipeType', 'steps', 'ingredients', 'equipment']);
+        $recipe->load(['user', 'brewMethod', 'steps', 'ingredients', 'equipment']);
 
         return new RecipeResource($recipe);
     }
@@ -145,7 +164,7 @@ class RecipeController extends Controller
     {
         $recipes = $request->user()
             ->recipes()
-            ->with(['brewMethod', 'recipeType'])
+            ->with(['brewMethod'])
             ->latest()
             ->paginate(15);
 

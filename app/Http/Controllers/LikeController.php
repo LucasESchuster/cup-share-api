@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Recipe;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class LikeController extends Controller
 {
@@ -19,10 +20,15 @@ class LikeController extends Controller
             abort(404);
         }
 
+        $user = null;
+        if ($token = $request->bearerToken()) {
+            $user = PersonalAccessToken::findToken($token)?->tokenable;
+        }
+
         return response()->json([
             'likes_count' => $recipe->likes_count,
-            'liked_by_me' => $request->user()
-                ? $recipe->likes()->where('user_id', $request->user()->id)->exists()
+            'liked_by_me' => $user
+                ? $recipe->likes()->where('user_id', $user->id)->exists()
                 : false,
         ]);
     }
@@ -46,7 +52,7 @@ class LikeController extends Controller
         $recipe->likes()->create(['user_id' => $request->user()->id]);
         $recipe->increment('likes_count');
 
-        return response()->json(['likes_count' => $recipe->likes_count + 1], 201);
+        return response()->json(['likes_count' => $recipe->likes_count], 201);
     }
 
     /**

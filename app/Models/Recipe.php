@@ -18,7 +18,6 @@ class Recipe extends Model
     protected $fillable = [
         'user_id',
         'brew_method_id',
-        'recipe_type_id',
         'title',
         'slug',
         'description',
@@ -48,11 +47,6 @@ class Recipe extends Model
     public function brewMethod(): BelongsTo
     {
         return $this->belongsTo(BrewMethod::class);
-    }
-
-    public function recipeType(): BelongsTo
-    {
-        return $this->belongsTo(RecipeType::class);
     }
 
     public function steps(): HasMany

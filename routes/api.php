@@ -7,7 +7,6 @@ use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\RecipeEquipmentController;
-use App\Http\Controllers\RecipeTypeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,9 +24,6 @@ Route::prefix('auth')->group(function () {
 
 // Brew Methods
 Route::apiResource('brew-methods', BrewMethodController::class)->only(['index', 'show']);
-
-// Recipe Types
-Route::apiResource('recipe-types', RecipeTypeController::class)->only(['index', 'show']);
 
 // Ingredients
 Route::apiResource('ingredients', IngredientController::class)->only(['index', 'show']);
@@ -60,9 +56,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Brew Methods (management)
     Route::apiResource('brew-methods', BrewMethodController::class)->only(['store', 'update', 'destroy']);
-
-    // Recipe Types (management)
-    Route::apiResource('recipe-types', RecipeTypeController::class)->only(['store', 'update', 'destroy']);
 
     // Ingredients (management)
     Route::apiResource('ingredients', IngredientController::class)->only(['store', 'update', 'destroy']);

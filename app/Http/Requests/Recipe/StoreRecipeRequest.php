@@ -20,7 +20,6 @@ class StoreRecipeRequest extends FormRequest
             'title' => ['required', 'string', 'max:200'],
             'description' => ['nullable', 'string', 'max:2000'],
             'brew_method_id' => ['required', 'integer', 'exists:brew_methods,id'],
-            'recipe_type_id' => ['required', 'integer', 'exists:recipe_types,id'],
             'coffee_grams' => ['required', 'numeric', 'min:0.1', 'max:9999'],
             'water_ml' => ['nullable', 'integer', 'min:1', 'required_without:yield_ml'],
             'yield_ml' => ['nullable', 'integer', 'min:1', 'required_without:water_ml'],
