@@ -27,6 +27,7 @@ class Recipe extends Model
         'yield_ml',
         'brew_time_seconds',
         'visibility',
+        'video_url',
     ];
 
     protected function casts(): array

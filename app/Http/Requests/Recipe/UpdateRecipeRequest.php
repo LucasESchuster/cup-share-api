@@ -25,6 +25,7 @@ class UpdateRecipeRequest extends FormRequest
             'yield_ml' => ['nullable', 'integer', 'min:1'],
             'brew_time_seconds' => ['sometimes', 'integer', 'min:1'],
             'visibility' => ['sometimes', new Enum(RecipeVisibility::class)],
+            'video_url' => ['sometimes', 'nullable', 'url', 'max:2048'],
 
             // Steps (full replace when provided)
             'steps' => ['sometimes', 'array'],

@@ -26,6 +26,7 @@ class StoreRecipeRequest extends FormRequest
             'yield_ml' => ['nullable', 'integer', 'min:1', 'required_without:water_ml'],
             'brew_time_seconds' => ['required', 'integer', 'min:1'],
             'visibility' => ['sometimes', new Enum(RecipeVisibility::class)],
+            'video_url' => ['nullable', 'url', 'max:2048'],
 
             // Steps
             'steps' => ['sometimes', 'array'],
