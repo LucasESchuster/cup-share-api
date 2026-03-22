@@ -23,7 +23,7 @@ class MagicLinkNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $url = url("/api/v1/auth/magic-link/{$this->token}");
+        $url = config('app.frontend_url')."/auth/callback?token={$this->token}";
 
         return (new MailMessage)
             ->subject('Seu link de acesso — Cup Share')
