@@ -12,7 +12,6 @@ class RecipeStepResource extends JsonResource
         return [
             'order' => $this->order,
             'description' => $this->description,
-            'duration_seconds' => $this->duration_seconds,
         ];
     }
 }

@@ -32,7 +32,6 @@ class UpdateRecipeRequest extends FormRequest
             'steps' => ['sometimes', 'array'],
             'steps.*.order' => ['required_with:steps', 'integer', 'min:1'],
             'steps.*.description' => ['required_with:steps', 'string', 'max:1000'],
-            'steps.*.duration_seconds' => ['nullable', 'integer', 'min:1'],
 
             // Ingredients (full sync when provided)
             'ingredients' => ['sometimes', 'array'],

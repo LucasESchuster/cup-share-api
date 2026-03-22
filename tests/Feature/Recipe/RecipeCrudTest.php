@@ -32,8 +32,8 @@ class RecipeCrudTest extends TestCase
             'water_ml' => 250,
             'brew_time_seconds' => 210,
             'steps' => [
-                ['order' => 1, 'description' => 'Pré-aqueça o filtro', 'duration_seconds' => null],
-                ['order' => 2, 'description' => 'Jogue 30ml de água', 'duration_seconds' => 30],
+                ['order' => 1, 'description' => 'Pré-aqueça o filtro'],
+                ['order' => 2, 'description' => 'Jogue 30ml de água'],
             ],
         ], $overrides);
     }

@@ -13,7 +13,6 @@ class RecipeStep extends Model
         'recipe_id',
         'order',
         'description',
-        'duration_seconds',
     ];
 
     public function recipe(): BelongsTo
