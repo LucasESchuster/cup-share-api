@@ -18,10 +18,16 @@ class MagicLinkService
 
     public function requestLink(string $email): void
     {
-        $user = User::firstOrCreate(
-            ['email' => $email],
-            ['name' => Str::before($email, '@')]
-        );
+        $user = User::withTrashed()->where('email', $email)->first();
+
+        if ($user && $user->trashed()) {
+            $user->restore();
+        } elseif (! $user) {
+            $user = User::create([
+                'email' => $email,
+                'name' => Str::before($email, '@'),
+            ]);
+        }
 
         // Invalidate previous unused links
         MagicLink::where('user_id', $user->id)
