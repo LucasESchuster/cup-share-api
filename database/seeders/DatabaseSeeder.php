@@ -1,0 +1,18 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $this->call([
+            BrewMethodSeeder::class,
+            RecipeTypeSeeder::class,
+            IngredientSeeder::class,
+            EquipmentSeeder::class,
+        ]);
+    }
+}

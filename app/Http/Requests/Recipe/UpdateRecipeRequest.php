@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Http\Requests\Recipe;
+
+use App\Enums\RecipeVisibility;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
+
+class UpdateRecipeRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'title' => ['sometimes', 'string', 'max:200'],
+            'description' => ['nullable', 'string', 'max:2000'],
+            'brew_method_id' => ['sometimes', 'integer', 'exists:brew_methods,id'],
+            'recipe_type_id' => ['sometimes', 'integer', 'exists:recipe_types,id'],
+            'coffee_grams' => ['sometimes', 'numeric', 'min:0.1', 'max:9999'],
+            'water_ml' => ['nullable', 'integer', 'min:1'],
+            'yield_ml' => ['nullable', 'integer', 'min:1'],
+            'brew_time_seconds' => ['sometimes', 'integer', 'min:1'],
+            'visibility' => ['sometimes', new Enum(RecipeVisibility::class)],
+
+            // Steps (full replace when provided)
+            'steps' => ['sometimes', 'array'],
+            'steps.*.order' => ['required_with:steps', 'integer', 'min:1'],
+            'steps.*.description' => ['required_with:steps', 'string', 'max:1000'],
+            'steps.*.duration_seconds' => ['nullable', 'integer', 'min:1'],
+
+            // Ingredients (full sync when provided)
+            'ingredients' => ['sometimes', 'array'],
+            'ingredients.*.id' => ['required_with:ingredients', 'integer', 'exists:ingredients,id'],
+            'ingredients.*.quantity' => ['required_with:ingredients', 'numeric', 'min:0.01'],
+            'ingredients.*.unit' => ['required_with:ingredients', 'string', 'max:50'],
+        ];
+    }
+}
