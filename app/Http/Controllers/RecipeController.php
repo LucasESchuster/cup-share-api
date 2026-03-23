@@ -51,7 +51,7 @@ class RecipeController extends Controller
             }
         }
 
-        $recipe->load(['user', 'brewMethod', 'steps', 'ingredients', 'equipment']);
+        $recipe->load(['user', 'brewMethod', 'steps', 'equipment']);
 
         $recipe->setAttribute(
             'liked_by_me',
@@ -82,12 +82,11 @@ class RecipeController extends Controller
             ]);
 
             $this->syncSteps($recipe, $data['steps'] ?? []);
-            $this->syncIngredients($recipe, $data['ingredients'] ?? []);
 
             return $recipe;
         });
 
-        $recipe->load(['user', 'brewMethod', 'steps', 'ingredients', 'equipment']);
+        $recipe->load(['user', 'brewMethod', 'steps', 'equipment']);
 
         return new RecipeResource($recipe);
     }
@@ -125,12 +124,9 @@ class RecipeController extends Controller
                 $this->syncSteps($recipe, $data['steps']);
             }
 
-            if (array_key_exists('ingredients', $data)) {
-                $this->syncIngredients($recipe, $data['ingredients']);
-            }
         });
 
-        $recipe->load(['user', 'brewMethod', 'steps', 'ingredients', 'equipment']);
+        $recipe->load(['user', 'brewMethod', 'steps', 'equipment']);
 
         return new RecipeResource($recipe);
     }
@@ -182,16 +178,4 @@ class RecipeController extends Controller
         $recipe->steps()->createMany($steps);
     }
 
-    private function syncIngredients(Recipe $recipe, array $ingredients): void
-    {
-        $syncData = [];
-        foreach ($ingredients as $ingredient) {
-            $syncData[$ingredient['id']] = [
-                'quantity' => $ingredient['quantity'],
-                'unit' => $ingredient['unit'],
-            ];
-        }
-
-        $recipe->ingredients()->sync($syncData);
-    }
 }

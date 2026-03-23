@@ -54,12 +54,6 @@ class Recipe extends Model
         return $this->hasMany(RecipeStep::class)->orderBy('order');
     }
 
-    public function ingredients(): BelongsToMany
-    {
-        return $this->belongsToMany(Ingredient::class, 'recipe_ingredient')
-            ->withPivot('quantity', 'unit');
-    }
-
     public function equipment(): BelongsToMany
     {
         return $this->belongsToMany(Equipment::class, 'recipe_equipment')

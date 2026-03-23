@@ -33,12 +33,6 @@ class StoreRecipeRequest extends FormRequest
             'steps' => ['sometimes', 'array'],
             'steps.*.order' => ['required_with:steps', 'integer', 'min:1'],
             'steps.*.description' => ['required_with:steps', 'string', 'max:1000'],
-
-            // Extra ingredients
-            'ingredients' => ['sometimes', 'array'],
-            'ingredients.*.id' => ['required_with:ingredients', 'integer', 'exists:ingredients,id'],
-            'ingredients.*.quantity' => ['required_with:ingredients', 'numeric', 'min:0.01'],
-            'ingredients.*.unit' => ['required_with:ingredients', 'string', 'max:50'],
         ];
     }
 }

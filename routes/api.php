@@ -3,7 +3,6 @@
 use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\BrewMethodController;
 use App\Http\Controllers\EquipmentController;
-use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\RecipeEquipmentController;
@@ -24,9 +23,6 @@ Route::prefix('auth')->group(function () {
 
 // Brew Methods
 Route::apiResource('brew-methods', BrewMethodController::class)->only(['index', 'show']);
-
-// Ingredients
-Route::apiResource('ingredients', IngredientController::class)->only(['index', 'show']);
 
 // Equipment (global only, publicly visible)
 Route::apiResource('equipment', EquipmentController::class)->only(['index', 'show']);
@@ -56,9 +52,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Brew Methods (management)
     Route::apiResource('brew-methods', BrewMethodController::class)->only(['store', 'update', 'destroy']);
-
-    // Ingredients (management)
-    Route::apiResource('ingredients', IngredientController::class)->only(['store', 'update', 'destroy']);
 
     // Equipment (management)
     Route::post('equipment', [EquipmentController::class, 'store']);

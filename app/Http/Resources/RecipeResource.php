@@ -33,7 +33,6 @@ class RecipeResource extends JsonResource
             'brew_method' => new BrewMethodResource($this->whenLoaded('brewMethod')),
             'user' => new UserResource($this->whenLoaded('user')),
             'steps' => RecipeStepResource::collection($this->whenLoaded('steps')),
-            'ingredients' => IngredientResource::collection($this->whenLoaded('ingredients')),
             'equipment' => EquipmentResource::collection($this->whenLoaded('equipment')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
