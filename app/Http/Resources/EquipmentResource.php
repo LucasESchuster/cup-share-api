@@ -15,7 +15,6 @@ class EquipmentResource extends JsonResource
             'brand' => $this->brand,
             'model' => $this->model,
             'type' => $this->type,
-            'is_global' => $this->user_id === null,
             'pivot' => $this->when($this->pivot !== null, fn () => [
                 'grinder_clicks' => $this->pivot->grinder_clicks,
                 'parameters' => $this->pivot->parameters ? json_decode($this->pivot->parameters, true) : null,

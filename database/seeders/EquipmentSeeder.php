@@ -40,8 +40,8 @@ class EquipmentSeeder extends Seeder
 
         foreach ($equipment as $item) {
             Equipment::firstOrCreate(
-                ['name' => $item['name'], 'user_id' => null],
-                array_merge($item, ['user_id' => null, 'type' => $item['type']->value])
+                ['name' => $item['name']],
+                array_merge($item, ['type' => $item['type']->value])
             );
         }
     }

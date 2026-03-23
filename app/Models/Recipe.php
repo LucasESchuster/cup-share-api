@@ -60,6 +60,11 @@ class Recipe extends Model
             ->withPivot('grinder_clicks', 'parameters');
     }
 
+    public function equipmentEntries(): HasMany
+    {
+        return $this->hasMany(RecipeEquipment::class);
+    }
+
     public function likes(): HasMany
     {
         return $this->hasMany(Like::class);

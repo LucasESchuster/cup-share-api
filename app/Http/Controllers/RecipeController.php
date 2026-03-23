@@ -51,7 +51,7 @@ class RecipeController extends Controller
             }
         }
 
-        $recipe->load(['user', 'brewMethod', 'steps', 'equipment']);
+        $recipe->load(['user', 'brewMethod', 'steps', 'equipmentEntries.equipment']);
 
         $recipe->setAttribute(
             'liked_by_me',
@@ -86,7 +86,7 @@ class RecipeController extends Controller
             return $recipe;
         });
 
-        $recipe->load(['user', 'brewMethod', 'steps', 'equipment']);
+        $recipe->load(['user', 'brewMethod', 'steps', 'equipmentEntries.equipment']);
 
         return new RecipeResource($recipe);
     }
@@ -126,7 +126,7 @@ class RecipeController extends Controller
 
         });
 
-        $recipe->load(['user', 'brewMethod', 'steps', 'equipment']);
+        $recipe->load(['user', 'brewMethod', 'steps', 'equipmentEntries.equipment']);
 
         return new RecipeResource($recipe);
     }

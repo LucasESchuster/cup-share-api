@@ -14,9 +14,10 @@ class RecipeEquipmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'equipment_id' => ['required', 'integer', 'exists:equipment,id'],
+            'equipment_id'   => ['nullable', 'integer', 'exists:equipment,id', 'required_without:custom_name'],
+            'custom_name'    => ['nullable', 'string', 'max:150', 'required_without:equipment_id'],
             'grinder_clicks' => ['nullable', 'integer', 'min:0'],
-            'parameters' => ['nullable', 'array'],
+            'parameters'     => ['nullable', 'array'],
         ];
     }
 }

@@ -3,60 +3,59 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Recipe\RecipeEquipmentRequest;
-use App\Http\Resources\EquipmentResource;
-use App\Models\Equipment;
+use App\Http\Resources\RecipeEquipmentResource;
 use App\Models\Recipe;
+use App\Models\RecipeEquipment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class RecipeEquipmentController extends Controller
 {
-    public function store(RecipeEquipmentRequest $request, Recipe $recipe): EquipmentResource
+    public function store(RecipeEquipmentRequest $request, Recipe $recipe): RecipeEquipmentResource
     {
         $this->authorize('update', $recipe);
 
         $data = $request->validated();
-        $equipment = Equipment::findOrFail($data['equipment_id']);
 
-        $recipe->equipment()->syncWithoutDetaching([
-            $equipment->id => [
-                'grinder_clicks' => $data['grinder_clicks'] ?? null,
-                'parameters' => isset($data['parameters']) ? json_encode($data['parameters']) : null,
-            ],
+        $entry = $recipe->equipmentEntries()->create([
+            'equipment_id'   => $data['equipment_id'] ?? null,
+            'custom_name'    => $data['custom_name'] ?? null,
+            'grinder_clicks' => $data['grinder_clicks'] ?? null,
+            'parameters'     => isset($data['parameters']) ? json_encode($data['parameters']) : null,
         ]);
 
-        $equipment->pivot = $recipe->equipment()->where('equipment_id', $equipment->id)->first()->pivot;
+        $entry->load('equipment');
 
-        return new EquipmentResource($equipment);
+        return new RecipeEquipmentResource($entry);
     }
 
-    public function update(Request $request, Recipe $recipe, Equipment $equipment): EquipmentResource
+    public function update(Request $request, Recipe $recipe, RecipeEquipment $recipeEquipment): RecipeEquipmentResource
     {
         $this->authorize('update', $recipe);
 
         $request->validate([
             'grinder_clicks' => ['nullable', 'integer', 'min:0'],
-            'parameters' => ['nullable', 'array'],
+            'parameters'     => ['nullable', 'array'],
         ]);
 
-        $recipe->equipment()->updateExistingPivot($equipment->id, [
+        $recipeEquipment->update([
             'grinder_clicks' => $request->grinder_clicks,
-            'parameters' => $request->parameters ? json_encode($request->parameters) : null,
+            'parameters'     => $request->parameters ? json_encode($request->parameters) : null,
         ]);
 
-        $equipment->pivot = $recipe->equipment()->where('equipment_id', $equipment->id)->first()->pivot;
+        $recipeEquipment->load('equipment');
 
-        return new EquipmentResource($equipment);
+        return new RecipeEquipmentResource($recipeEquipment);
     }
 
     /**
      * @response 204
      */
-    public function destroy(Recipe $recipe, Equipment $equipment): JsonResponse
+    public function destroy(Recipe $recipe, RecipeEquipment $recipeEquipment): JsonResponse
     {
         $this->authorize('update', $recipe);
 
-        $recipe->equipment()->detach($equipment->id);
+        $recipeEquipment->delete();
 
         return response()->json(null, 204);
     }

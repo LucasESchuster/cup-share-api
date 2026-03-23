@@ -5,8 +5,7 @@ use App\Http\Controllers\BrewMethodController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\RecipeController;
-use App\Http\Controllers\RecipeEquipmentController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\RecipeEquipmentController;use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -48,15 +47,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('users/me', [UserController::class, 'update']);
     Route::delete('users/me', [UserController::class, 'destroy']);
     Route::get('users/me/recipes', [RecipeController::class, 'myRecipes']);
-    Route::get('users/me/equipment', [EquipmentController::class, 'myEquipment']);
 
     // Brew Methods (management)
     Route::apiResource('brew-methods', BrewMethodController::class)->only(['store', 'update', 'destroy']);
-
-    // Equipment (management)
-    Route::post('equipment', [EquipmentController::class, 'store']);
-    Route::put('equipment/{equipment}', [EquipmentController::class, 'update']);
-    Route::delete('equipment/{equipment}', [EquipmentController::class, 'destroy']);
 
     // Recipes (CRUD + visibility)
     Route::post('recipes', [RecipeController::class, 'store']);
@@ -66,8 +59,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Recipe Equipment
     Route::post('recipes/{recipe}/equipment', [RecipeEquipmentController::class, 'store']);
-    Route::put('recipes/{recipe}/equipment/{equipment}', [RecipeEquipmentController::class, 'update']);
-    Route::delete('recipes/{recipe}/equipment/{equipment}', [RecipeEquipmentController::class, 'destroy']);
+    Route::put('recipes/{recipe}/equipment/{recipeEquipment}', [RecipeEquipmentController::class, 'update']);
+    Route::delete('recipes/{recipe}/equipment/{recipeEquipment}', [RecipeEquipmentController::class, 'destroy']);
 
     // Likes
     Route::post('recipes/{recipe}/likes', [LikeController::class, 'store']);
