@@ -88,6 +88,7 @@ class RecipeController extends Controller
             ]);
 
             $this->syncSteps($recipe, $data['steps'] ?? []);
+            $this->syncEquipment($recipe, $data['equipment'] ?? []);
 
             return $recipe;
         });
@@ -128,6 +129,10 @@ class RecipeController extends Controller
 
             if (array_key_exists('steps', $data)) {
                 $this->syncSteps($recipe, $data['steps']);
+            }
+
+            if (array_key_exists('equipment', $data)) {
+                $this->syncEquipment($recipe, $data['equipment']);
             }
 
         });
@@ -182,6 +187,24 @@ class RecipeController extends Controller
         }
 
         $recipe->steps()->createMany($steps);
+    }
+
+    private function syncEquipment(Recipe $recipe, array $equipment): void
+    {
+        $recipe->equipmentEntries()->delete();
+
+        if (empty($equipment)) {
+            return;
+        }
+
+        $entries = array_map(function ($item) {
+            if (isset($item['parameters']) && is_array($item['parameters'])) {
+                $item['parameters'] = json_encode($item['parameters']);
+            }
+            return $item;
+        }, $equipment);
+
+        $recipe->equipmentEntries()->createMany($entries);
     }
 
 }
