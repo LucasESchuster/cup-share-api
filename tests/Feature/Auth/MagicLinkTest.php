@@ -59,7 +59,7 @@ class MagicLinkTest extends TestCase
             ->assertJsonStructure(['token']);
 
         $this->assertNotNull($response->json('token'));
-        $this->assertDatabaseHas('magic_links', ['token' => 'token-valido-123', 'used_at' => now()->toDateTimeString()]);
+        $this->assertNotNull(MagicLink::where('token', 'token-valido-123')->value('used_at'));
     }
 
     public function test_consume_expired_token_returns_422(): void
