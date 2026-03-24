@@ -29,9 +29,16 @@ class UpdateRecipeRequest extends FormRequest
             'coffee_description'         => ['sometimes', 'nullable', 'string', 'max:1000'],
 
             // Steps (full replace when provided)
-            'steps' => ['sometimes', 'array'],
-            'steps.*.order' => ['required_with:steps', 'integer', 'min:1'],
+            'steps'               => ['sometimes', 'array'],
+            'steps.*.order'       => ['required_with:steps', 'integer', 'min:1'],
             'steps.*.description' => ['required_with:steps', 'string', 'max:1000'],
+
+            // Equipment (full replace when provided)
+            'equipment'                  => ['sometimes', 'array'],
+            'equipment.*.equipment_id'   => ['nullable', 'integer', 'exists:equipment,id'],
+            'equipment.*.custom_name'    => ['nullable', 'string', 'max:150'],
+            'equipment.*.grinder_clicks' => ['nullable', 'integer', 'min:0'],
+            'equipment.*.parameters'     => ['nullable', 'array'],
         ];
     }
 }

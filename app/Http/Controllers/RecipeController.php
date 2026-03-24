@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Recipe\RecipeFilterRequest;
 use App\Http\Requests\Recipe\StoreRecipeRequest;
 use App\Http\Requests\Recipe\UpdateRecipeRequest;
 use App\Http\Resources\RecipeResource;
@@ -16,12 +17,17 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class RecipeController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(RecipeFilterRequest $request): AnonymousResourceCollection
     {
         $recipes = Recipe::public()
             ->with(['user', 'brewMethod'])
+            ->when($request->filled('title'), fn ($q) => $q->where('title', 'ilike', '%'.$request->title.'%'))
             ->when($request->filled('brew_method_id'), fn ($q) => $q->where('brew_method_id', $request->brew_method_id))
-            ->latest()
+            ->when($request->filled('category'), fn ($q) => $q->whereHas('brewMethod', fn ($bm) => $bm->where('category', $request->category)))
+            ->when($request->filled('user_id'), fn ($q) => $q->where('user_id', $request->user_id))
+            ->when($request->filled('published_from'), fn ($q) => $q->whereDate('created_at', '>=', $request->published_from))
+            ->when($request->filled('published_to'), fn ($q) => $q->whereDate('created_at', '<=', $request->published_to))
+            ->orderBy($request->input('sort_by', 'created_at'), $request->input('sort_dir', 'desc'))
             ->paginate(15);
 
         $user = null;
@@ -82,6 +88,7 @@ class RecipeController extends Controller
             ]);
 
             $this->syncSteps($recipe, $data['steps'] ?? []);
+            $this->syncEquipment($recipe, $data['equipment'] ?? []);
 
             return $recipe;
         });
@@ -122,6 +129,10 @@ class RecipeController extends Controller
 
             if (array_key_exists('steps', $data)) {
                 $this->syncSteps($recipe, $data['steps']);
+            }
+
+            if (array_key_exists('equipment', $data)) {
+                $this->syncEquipment($recipe, $data['equipment']);
             }
 
         });
@@ -176,6 +187,24 @@ class RecipeController extends Controller
         }
 
         $recipe->steps()->createMany($steps);
+    }
+
+    private function syncEquipment(Recipe $recipe, array $equipment): void
+    {
+        $recipe->equipmentEntries()->delete();
+
+        if (empty($equipment)) {
+            return;
+        }
+
+        $entries = array_map(function ($item) {
+            if (isset($item['parameters']) && is_array($item['parameters'])) {
+                $item['parameters'] = json_encode($item['parameters']);
+            }
+            return $item;
+        }, $equipment);
+
+        $recipe->equipmentEntries()->createMany($entries);
     }
 
 }
