@@ -19,13 +19,28 @@ class User extends Authenticatable
         'name',
         'email',
         'email_verified_at',
+        'is_admin',
+        'banned_at',
+        'ban_reason',
     ];
 
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
+            'is_admin'          => 'boolean',
+            'banned_at'         => 'datetime',
         ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return (bool) $this->is_admin;
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->banned_at !== null;
     }
 
     public function recipes(): HasMany
