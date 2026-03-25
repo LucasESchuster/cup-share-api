@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin;
 use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\BrewMethodController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\RecipeController;
-use App\Http\Controllers\RecipeEquipmentController;use App\Http\Controllers\UserController;
+use App\Http\Controllers\RecipeEquipmentController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,7 +39,7 @@ Route::get('recipes/{recipe}/likes', [LikeController::class, 'show']);
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'not_banned'])->group(function () {
 
     // Auth
     Route::delete('auth/logout', [MagicLinkController::class, 'destroy']);
@@ -47,9 +49,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('users/me', [UserController::class, 'update']);
     Route::delete('users/me', [UserController::class, 'destroy']);
     Route::get('users/me/recipes', [RecipeController::class, 'myRecipes']);
-
-    // Brew Methods (management)
-    Route::apiResource('brew-methods', BrewMethodController::class)->only(['store', 'update', 'destroy']);
 
     // Recipes (CRUD + visibility)
     Route::post('recipes', [RecipeController::class, 'store']);
@@ -65,4 +64,26 @@ Route::middleware('auth:sanctum')->group(function () {
     // Likes
     Route::post('recipes/{recipe}/likes', [LikeController::class, 'store']);
     Route::delete('recipes/{recipe}/likes', [LikeController::class, 'destroy']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Admin routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth:sanctum', 'not_banned', 'admin'])->prefix('admin')->group(function () {
+
+    // Brew Methods (admin manage)
+    Route::apiResource('brew-methods', BrewMethodController::class)->only(['store', 'update', 'destroy']);
+
+    // Equipment (admin manage global equipment)
+    Route::apiResource('equipment', EquipmentController::class)->only(['store', 'update', 'destroy']);
+
+    // User management
+    Route::post('users/{user}/ban', [Admin\UserController::class, 'ban']);
+    Route::delete('users/{user}/ban', [Admin\UserController::class, 'unban']);
+
+    // Magic links status
+    Route::get('magic-links', [Admin\MagicLinkController::class, 'index']);
 });
