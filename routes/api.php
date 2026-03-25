@@ -81,6 +81,7 @@ Route::middleware(['auth:sanctum', 'not_banned', 'admin'])->prefix('admin')->gro
     Route::apiResource('equipment', EquipmentController::class)->only(['store', 'update', 'destroy']);
 
     // User management
+    Route::get('users', [Admin\UserController::class, 'index']);
     Route::post('users/{user}/ban', [Admin\UserController::class, 'ban']);
     Route::delete('users/{user}/ban', [Admin\UserController::class, 'unban']);
 

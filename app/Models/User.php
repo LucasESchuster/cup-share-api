@@ -21,6 +21,7 @@ class User extends Authenticatable
         'email_verified_at',
         'is_admin',
         'banned_at',
+        'ban_reason',
     ];
 
     protected function casts(): array

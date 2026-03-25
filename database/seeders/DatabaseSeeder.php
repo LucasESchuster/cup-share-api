@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             BrewMethodSeeder::class,
             EquipmentSeeder::class,
+            RecipeSeeder::class,
         ]);
     }
 }

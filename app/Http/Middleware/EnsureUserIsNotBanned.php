@@ -11,7 +11,13 @@ class EnsureUserIsNotBanned
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->user() && $request->user()->banned_at !== null) {
-            return response()->json(['message' => 'Account suspended.'], 403);
+            $user = $request->user();
+
+            return response()->json([
+                'message'    => 'Account suspended.',
+                'banned_at'  => $user->banned_at,
+                'ban_reason' => $user->ban_reason,
+            ], 403);
         }
 
         return $next($request);
