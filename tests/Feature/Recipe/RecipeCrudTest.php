@@ -35,6 +35,7 @@ class RecipeCrudTest extends TestCase
                 ['order' => 1, 'description' => 'Pré-aqueça o filtro'],
                 ['order' => 2, 'description' => 'Jogue 30ml de água'],
             ],
+            'cf_turnstile_response' => 'test-token',
         ], $overrides);
     }
 
@@ -76,7 +77,10 @@ class RecipeCrudTest extends TestCase
         ]);
 
         $this->actingAs($this->user)
-            ->putJson("/api/v1/recipes/{$recipe->id}", ['title' => 'Título atualizado'])
+            ->putJson("/api/v1/recipes/{$recipe->id}", [
+                'title' => 'Título atualizado',
+                'cf_turnstile_response' => 'test-token',
+            ])
             ->assertStatus(200)
             ->assertJsonFragment(['title' => 'Título atualizado']);
     }
@@ -90,7 +94,10 @@ class RecipeCrudTest extends TestCase
         ]);
 
         $this->actingAs($otherUser)
-            ->putJson("/api/v1/recipes/{$recipe->id}", ['title' => 'Tentativa de hack'])
+            ->putJson("/api/v1/recipes/{$recipe->id}", [
+                'title' => 'Tentativa de hack',
+                'cf_turnstile_response' => 'test-token',
+            ])
             ->assertStatus(403);
     }
 
