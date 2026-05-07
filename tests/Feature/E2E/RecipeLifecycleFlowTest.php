@@ -37,6 +37,7 @@ class RecipeLifecycleFlowTest extends TestCase
                     ['order' => 1, 'description' => 'Moer o café'],
                     ['order' => 2, 'description' => 'Molhar o filtro'],
                 ],
+                'cf_turnstile_response' => 'test-token',
             ])
             ->assertStatus(201)
             ->assertJsonFragment(['visibility' => 'private']);
@@ -87,6 +88,7 @@ class RecipeLifecycleFlowTest extends TestCase
                 'coffee_grams' => 15,
                 'water_ml' => 250,
                 'brew_time_seconds' => 210,
+                'cf_turnstile_response' => 'test-token',
             ])
             ->assertStatus(201);
 
@@ -113,6 +115,7 @@ class RecipeLifecycleFlowTest extends TestCase
                 'coffee_grams' => 18,
                 'yield_ml' => 36,
                 'brew_time_seconds' => 27,
+                'cf_turnstile_response' => 'test-token',
             ])
             ->assertStatus(201);
 
@@ -142,6 +145,7 @@ class RecipeLifecycleFlowTest extends TestCase
                     ['order' => 1, 'description' => 'Passo 1'],
                     ['order' => 2, 'description' => 'Passo 2'],
                 ],
+                'cf_turnstile_response' => 'test-token',
             ])
             ->assertStatus(201);
 
@@ -149,7 +153,10 @@ class RecipeLifecycleFlowTest extends TestCase
         $this->assertDatabaseCount('recipe_steps', 2);
 
         $this->actingAs($author, 'sanctum')
-            ->putJson("/api/v1/recipes/{$recipeId}", ['title' => 'Só título mudou'])
+            ->putJson("/api/v1/recipes/{$recipeId}", [
+                'title' => 'Só título mudou',
+                'cf_turnstile_response' => 'test-token',
+            ])
             ->assertStatus(200)
             ->assertJsonFragment(['title' => 'Só título mudou']);
 

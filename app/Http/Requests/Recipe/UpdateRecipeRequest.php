@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Recipe;
 
 use App\Enums\RecipeVisibility;
+use App\Rules\TurnstileToken;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 
@@ -39,6 +40,8 @@ class UpdateRecipeRequest extends FormRequest
             'equipment.*.custom_name'    => ['nullable', 'string', 'max:150'],
             'equipment.*.grinder_clicks' => ['nullable', 'integer', 'min:0'],
             'equipment.*.parameters'     => ['nullable', 'array'],
+
+            'cf_turnstile_response' => ['required', 'string', new TurnstileToken()],
         ];
     }
 }

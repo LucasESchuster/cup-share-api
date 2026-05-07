@@ -17,8 +17,10 @@ class MagicLinkTest extends TestCase
     {
         Notification::fake();
 
-        $this->postJson('/api/v1/auth/magic-link', ['email' => 'novo@example.com'])
-            ->assertStatus(202);
+        $this->postJson('/api/v1/auth/magic-link', [
+            'email' => 'novo@example.com',
+            'cf_turnstile_response' => 'test-token',
+        ])->assertStatus(202);
 
         $this->assertDatabaseHas('users', ['email' => 'novo@example.com']);
         Notification::assertSentTo(User::where('email', 'novo@example.com')->first(), MagicLinkNotification::class);
@@ -30,17 +32,28 @@ class MagicLinkTest extends TestCase
 
         $user = User::factory()->create(['email' => 'existente@example.com']);
 
-        $this->postJson('/api/v1/auth/magic-link', ['email' => $user->email])
-            ->assertStatus(202);
+        $this->postJson('/api/v1/auth/magic-link', [
+            'email' => $user->email,
+            'cf_turnstile_response' => 'test-token',
+        ])->assertStatus(202);
 
         Notification::assertSentTo($user, MagicLinkNotification::class);
     }
 
     public function test_request_magic_link_requires_valid_email(): void
     {
-        $this->postJson('/api/v1/auth/magic-link', ['email' => 'nao-é-email'])
-            ->assertStatus(422)
+        $this->postJson('/api/v1/auth/magic-link', [
+            'email' => 'nao-é-email',
+            'cf_turnstile_response' => 'test-token',
+        ])->assertStatus(422)
             ->assertJsonValidationErrors(['email']);
+    }
+
+    public function test_request_magic_link_requires_turnstile_token(): void
+    {
+        $this->postJson('/api/v1/auth/magic-link', ['email' => 'novo@example.com'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['cf_turnstile_response']);
     }
 
     public function test_consume_valid_token_returns_bearer_token(): void

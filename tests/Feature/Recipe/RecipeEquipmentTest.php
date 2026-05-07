@@ -32,6 +32,7 @@ class RecipeEquipmentTest extends TestCase
             'coffee_grams'      => 15,
             'water_ml'          => 250,
             'brew_time_seconds' => 210,
+            'cf_turnstile_response' => 'test-token',
         ], $overrides);
     }
 
@@ -120,6 +121,7 @@ class RecipeEquipmentTest extends TestCase
                 'equipment' => [
                     ['equipment_id' => $kettle->id],
                 ],
+                'cf_turnstile_response' => 'test-token',
             ])
             ->assertStatus(200);
 
@@ -138,7 +140,10 @@ class RecipeEquipmentTest extends TestCase
         $recipe->equipmentEntries()->create(['equipment_id' => $grinder->id]);
 
         $this->actingAs($this->user)
-            ->putJson("/api/v1/recipes/{$recipe->id}", ['title' => 'Novo título'])
+            ->putJson("/api/v1/recipes/{$recipe->id}", [
+                'title' => 'Novo título',
+                'cf_turnstile_response' => 'test-token',
+            ])
             ->assertStatus(200);
 
         $this->assertDatabaseHas('recipe_equipment', ['recipe_id' => $recipe->id, 'equipment_id' => $grinder->id]);
@@ -155,7 +160,10 @@ class RecipeEquipmentTest extends TestCase
         $recipe->equipmentEntries()->create(['equipment_id' => $grinder->id]);
 
         $this->actingAs($this->user)
-            ->putJson("/api/v1/recipes/{$recipe->id}", ['equipment' => []])
+            ->putJson("/api/v1/recipes/{$recipe->id}", [
+                'equipment' => [],
+                'cf_turnstile_response' => 'test-token',
+            ])
             ->assertStatus(200);
 
         $this->assertDatabaseCount('recipe_equipment', 0);

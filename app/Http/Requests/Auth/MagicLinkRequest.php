@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Rules\TurnstileToken;
 use Illuminate\Foundation\Http\FormRequest;
 
 class MagicLinkRequest extends FormRequest
@@ -15,6 +16,7 @@ class MagicLinkRequest extends FormRequest
     {
         return [
             'email' => ['required', 'email'],
+            'cf_turnstile_response' => ['required', 'string', new TurnstileToken()],
         ];
     }
 }

@@ -50,7 +50,10 @@ class AuthorizationFlowTest extends TestCase
         ]);
 
         $this->actingAs($attacker, 'sanctum')
-            ->putJson("/api/v1/recipes/{$recipe->id}", ['title' => 'Hack'])
+            ->putJson("/api/v1/recipes/{$recipe->id}", [
+                'title' => 'Hack',
+                'cf_turnstile_response' => 'test-token',
+            ])
             ->assertStatus(403);
 
         $this->actingAs($attacker, 'sanctum')

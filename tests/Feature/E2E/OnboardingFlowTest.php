@@ -16,7 +16,10 @@ class OnboardingFlowTest extends TestCase
         $brewMethod = BrewMethod::create(['name' => 'V60', 'slug' => 'v60', 'category' => 'filter']);
         $email = 'onboard@example.com';
 
-        $this->postJson('/api/v1/auth/magic-link', ['email' => $email])
+        $this->postJson('/api/v1/auth/magic-link', [
+            'email' => $email,
+            'cf_turnstile_response' => 'test-token',
+        ])
             ->assertStatus(202)
             ->assertJsonStructure(['message']);
 
@@ -55,6 +58,7 @@ class OnboardingFlowTest extends TestCase
                     ['order' => 1, 'description' => 'Aquecer a água a 95°C'],
                     ['order' => 2, 'description' => 'Despejar em movimentos circulares'],
                 ],
+                'cf_turnstile_response' => 'test-token',
             ])
             ->assertStatus(201)
             ->assertJsonFragment(['title' => 'Primeira receita onboarding'])
@@ -75,8 +79,10 @@ class OnboardingFlowTest extends TestCase
     {
         $email = 'verify@example.com';
 
-        $this->postJson('/api/v1/auth/magic-link', ['email' => $email])
-            ->assertStatus(202);
+        $this->postJson('/api/v1/auth/magic-link', [
+            'email' => $email,
+            'cf_turnstile_response' => 'test-token',
+        ])->assertStatus(202);
 
         $this->assertDatabaseHas('users', ['email' => $email, 'email_verified_at' => null]);
 

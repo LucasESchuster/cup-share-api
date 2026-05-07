@@ -16,8 +16,10 @@ class MagicLinkEdgeCasesFlowTest extends TestCase
     {
         Carbon::setTestNow('2026-04-20 10:00:00');
 
-        $this->postJson('/api/v1/auth/magic-link', ['email' => 'expire@example.com'])
-            ->assertStatus(202);
+        $this->postJson('/api/v1/auth/magic-link', [
+            'email' => 'expire@example.com',
+            'cf_turnstile_response' => 'test-token',
+        ])->assertStatus(202);
 
         $token = MagicLink::latest('id')->value('token');
         $this->assertNotNull($token);
@@ -35,8 +37,10 @@ class MagicLinkEdgeCasesFlowTest extends TestCase
     {
         Carbon::setTestNow('2026-04-20 10:00:00');
 
-        $this->postJson('/api/v1/auth/magic-link', ['email' => 'valid@example.com'])
-            ->assertStatus(202);
+        $this->postJson('/api/v1/auth/magic-link', [
+            'email' => 'valid@example.com',
+            'cf_turnstile_response' => 'test-token',
+        ])->assertStatus(202);
 
         $token = MagicLink::latest('id')->value('token');
 
@@ -51,8 +55,10 @@ class MagicLinkEdgeCasesFlowTest extends TestCase
 
     public function test_consumed_magic_link_cannot_be_reused(): void
     {
-        $this->postJson('/api/v1/auth/magic-link', ['email' => 'once@example.com'])
-            ->assertStatus(202);
+        $this->postJson('/api/v1/auth/magic-link', [
+            'email' => 'once@example.com',
+            'cf_turnstile_response' => 'test-token',
+        ])->assertStatus(202);
 
         $token = MagicLink::latest('id')->value('token');
 
@@ -75,14 +81,18 @@ class MagicLinkEdgeCasesFlowTest extends TestCase
     {
         $email = 'invalidation@example.com';
 
-        $this->postJson('/api/v1/auth/magic-link', ['email' => $email])
-            ->assertStatus(202);
+        $this->postJson('/api/v1/auth/magic-link', [
+            'email' => $email,
+            'cf_turnstile_response' => 'test-token',
+        ])->assertStatus(202);
 
         $firstToken = MagicLink::latest('id')->value('token');
         $this->assertDatabaseHas('magic_links', ['token' => $firstToken]);
 
-        $this->postJson('/api/v1/auth/magic-link', ['email' => $email])
-            ->assertStatus(202);
+        $this->postJson('/api/v1/auth/magic-link', [
+            'email' => $email,
+            'cf_turnstile_response' => 'test-token',
+        ])->assertStatus(202);
 
         $secondToken = MagicLink::latest('id')->value('token');
         $this->assertNotEquals($firstToken, $secondToken);
@@ -98,8 +108,10 @@ class MagicLinkEdgeCasesFlowTest extends TestCase
 
     public function test_logout_revokes_sanctum_token_from_magic_link(): void
     {
-        $this->postJson('/api/v1/auth/magic-link', ['email' => 'logout@example.com'])
-            ->assertStatus(202);
+        $this->postJson('/api/v1/auth/magic-link', [
+            'email' => 'logout@example.com',
+            'cf_turnstile_response' => 'test-token',
+        ])->assertStatus(202);
 
         $mlToken = MagicLink::latest('id')->value('token');
 
@@ -124,7 +136,10 @@ class MagicLinkEdgeCasesFlowTest extends TestCase
 
     public function test_magic_link_request_invalid_email_returns_422(): void
     {
-        $this->postJson('/api/v1/auth/magic-link', ['email' => 'not-an-email'])
+        $this->postJson('/api/v1/auth/magic-link', [
+            'email' => 'not-an-email',
+            'cf_turnstile_response' => 'test-token',
+        ])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['email']);
     }
@@ -133,8 +148,10 @@ class MagicLinkEdgeCasesFlowTest extends TestCase
     {
         $this->assertDatabaseMissing('users', ['email' => 'security@example.com']);
 
-        $this->postJson('/api/v1/auth/magic-link', ['email' => 'security@example.com'])
-            ->assertStatus(202);
+        $this->postJson('/api/v1/auth/magic-link', [
+            'email' => 'security@example.com',
+            'cf_turnstile_response' => 'test-token',
+        ])->assertStatus(202);
 
         $this->assertDatabaseHas('users', ['email' => 'security@example.com']);
     }

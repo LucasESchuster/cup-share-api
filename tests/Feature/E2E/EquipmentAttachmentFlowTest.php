@@ -49,6 +49,7 @@ class EquipmentAttachmentFlowTest extends TestCase
                 'coffee_grams' => 15,
                 'water_ml' => 250,
                 'brew_time_seconds' => 210,
+                'cf_turnstile_response' => 'test-token',
             ])
             ->assertStatus(201);
 
@@ -91,6 +92,7 @@ class EquipmentAttachmentFlowTest extends TestCase
                 'coffee_grams' => 15,
                 'water_ml' => 250,
                 'brew_time_seconds' => 210,
+                'cf_turnstile_response' => 'test-token',
             ])
             ->assertStatus(201);
 
@@ -116,6 +118,7 @@ class EquipmentAttachmentFlowTest extends TestCase
                 'coffee_grams' => 15,
                 'water_ml' => 250,
                 'brew_time_seconds' => 210,
+                'cf_turnstile_response' => 'test-token',
             ])
             ->assertStatus(201);
 
@@ -151,6 +154,7 @@ class EquipmentAttachmentFlowTest extends TestCase
                 'coffee_grams' => 15,
                 'water_ml' => 250,
                 'brew_time_seconds' => 210,
+                'cf_turnstile_response' => 'test-token',
             ])
             ->assertStatus(201);
 
